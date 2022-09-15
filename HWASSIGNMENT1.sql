@@ -20,7 +20,9 @@ CREATE TABLE Supplies (
 CREATE TABLE TavernSupplies (
 	Id INTEGER NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	TavernId INTEGER NOT NULL,
+	FOREIGN KEY (TavernId) REFERENCES Taverns(Id),
 	SupplyId INTEGER NOT NULL,
+	FOREIGN KEY (SupplyId) REFERENCES Supplies(Id),
 	SupplyAmount INTEGER,
 	LastUpdated DATE
 );
@@ -38,13 +40,17 @@ CREATE TABLE StatusTypes (
 CREATE TABLE TavernServices (
 	Id INTEGER NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	TavernId INTEGER NOT NULL,
+	FOREIGN KEY (TavernId) REFERENCES Taverns(Id),
 	ServiceId INTEGER NOT NULL,
+	FOREIGN KEY (ServiceId) REFERENCES OurServices(Id),
 	StatusId INTEGER NOT NULL
+	FOREIGN KEY (StatusId) REFERENCES StatusTypes(Id),
 );
 
 CREATE TABLE ServiceSales (
 	Id INTEGER NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	TavernAndServiceId INTEGER NOT NULL,
+	FOREIGN KEY (TavernAndServiceId) REFERENCES TavernServices(Id),
 	GuestName VARCHAR(50),
 	CostOfService INTEGER NOT NULL,
 	DatePurchased DATE NOT NULL,
