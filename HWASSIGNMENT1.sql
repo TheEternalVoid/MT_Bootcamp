@@ -80,7 +80,32 @@ CREATE TABLE Guests (
 	FOREIGN KEY (GuestStatusId) REFERENCES Statuses(Id),
 	GuestClassId INTEGER NOT NULL,
 	FOREIGN KEY (GuestClassId) REFERENCES Classes(Id),
-	GuestLevel INTEGER NOT NULL
+	GuestLevel INTEGER NOT NULL,
+	GuestTavernId INTEGER NOT NULL,
+	FOREIGN KEY (GuestTavernId) REFERENCES Taverns(Id)
+);
+
+CREATE TABLE RoomStatuses (
+	Id INTEGER NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	RoomStatus VARCHAR(25) NOT NULL
+);
+
+CREATE TABLE Rooms (
+	Id INTEGER NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	TavernsId INTEGER NOT NULL,
+	FOREIGN KEY (TavernsId) REFERENCES Taverns(Id),
+	RoomStatusId INTEGER NOT NULL,
+	FOREIGN KEY (RoomStatusId) REFERENCES RoomStatuses(Id)
+);
+
+CREATE TABLE RoomSales (
+	Id INTEGER NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	GuestNameId INTEGER NOT NULL,
+	FOREIGN KEY (GuestNameId) REFERENCES Guests(Id),
+	RoomId INTEGER NOT NULL,
+	FOREIGN KEY (RoomId) REFERENCES Rooms(Id),
+	RoomSaleDate DATE NOT NULL,
+	RoomSellCost INTEGER NOT NULL,
 );
 
 INSERT INTO Taverns (TavernName)
@@ -155,10 +180,74 @@ VALUES
 	('Rogue'),
 	('Druid');
 
-INSERT INTO Guests (GuestName, NotesAboutGuest, GuestBday, GuestStatusId, GuestClassId, GuestLevel)
+INSERT INTO Guests (GuestName, NotesAboutGuest, GuestBday, GuestStatusId, GuestClassId, GuestLevel, GuestTavernId)
 VALUES
-	('Tyler Hill', 'Dead inside', '1958-01-31', 5, 1, 1),
-	('Jerome Hill', 'Also Dead inside', '1959-01-31', 3, 2, 10),
-	('Larry Holland', 'Super Strong', '1997-01-31', 2, 1, 20),
-	('Kayle Gross', 'An actual druid', '1969-02-14', 4, 5, 7),
-	('Olley Dolley', 'Super Sweet', '1919-12-25', 1, 3, 19);
+	('Tyler Hill', 'Dead inside', '1958-01-31', 5, 1, 1, 1),
+	('Jerome Hill', 'Also Dead inside', '1959-01-31', 3, 2, 10, 1),
+	('Larry Holland', 'Super Strong', '1997-01-31', 2, 1, 20, 1),
+	('Kayle Gross', 'An actual druid', '1969-02-14', 4, 5, 7, 1),
+	('Olley Dolley', 'Super Sweet', '1919-12-25', 1, 3, 19, 1);
+
+INSERT INTO RoomStatuses (RoomStatus)
+VALUES
+	('Occupied'),
+	('Vacant');
+
+INSERT INTO Rooms (TavernsId, RoomStatusId)
+VALUES
+	(1, 1),
+	(1, 1),
+	(1, 1),
+	(1, 2),
+	(2, 2),
+	(2, 2),
+	(2, 2),
+	(2, 2),
+	(2, 2),
+	(2, 2);
+
+INSERT INTO RoomSales (GuestNameId, RoomId, RoomSaleDate, RoomSellCost)
+VALUES
+	(1, 1, '1959-01-31', 100),
+	(3, 5, '1959-04-20', 150),
+	(2, 2, '1959-02-14', 100),
+	(4, 4, '1959-02-14', 100);
+
+SELECT * FROM Guests WHERE GuestBday < '2000-01-01';
+SELECT * FROM RoomSales WHERE RoomSellCost > 100;
+SELECT DISTINCT GuestName FROM Guests;
+SELECT GuestName FROM Guests ORDER BY GuestName ASC;
+SELECT TOP 10 RoomSellCost FROM RoomSales ORDER BY RoomSellCost DESC;
+
+SELECT TavernsId, RoomStatusId, TavernName, SupplyName, CostInGoldPieces, 
+ServiceName, Status, TavernId, ServiceId, StatusName, ClassName, GuestName, 
+NotesAboutGuest, GuestBday, GuestStatusId, GuestClassId, GuestLevel, GuestTavernId,
+RoomStatus
+
+FROM Rooms
+LEFT JOIN Taverns
+ON Rooms.Id = Taverns.Id
+LEFT JOIN Supplies
+ON Rooms.Id = Supplies.Id
+LEFT JOIN OurServices
+ON Rooms.Id = OurServices.Id
+LEFT JOIN StatusTypes
+ON Rooms.Id = StatusTypes.Id
+LEFT JOIN TavernServices
+ON Rooms.Id = TavernServices.Id
+LEFT JOIN Statuses
+ON Rooms.Id = Statuses.Id
+LEFT JOIN Classes
+ON Rooms.Id = Classes.Id
+LEFT JOIN Guests
+ON Rooms.Id = Guests.Id
+LEFT JOIN RoomStatuses
+ON Rooms.Id = RoomStatuses.Id;
+
+SELECT GuestName, GuestClassId, GuestLevel,
+CASE
+	WHEN GuestLevel < 10 THEN 'Low Level'
+	WHEN GuestLevel < 20 THEN 'Medium Level'
+	ELSE 'High Level'
+END AS LevelGroup
+FROM Guests
