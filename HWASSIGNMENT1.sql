@@ -70,7 +70,6 @@ CREATE Table Classes (
 	ClassName VARCHAR(50),
 );
 
-
 CREATE TABLE Guests (
 	Id INTEGER NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	GuestName VARCHAR(50) NOT NULL,
@@ -108,6 +107,8 @@ CREATE TABLE RoomSales (
 	RoomSellCost INTEGER NOT NULL,
 );
 
+ALTER TABLE Supplies ADD SupplyUnit VARCHAR(50) NOT NULL;
+
 INSERT INTO Taverns (TavernName)
 VALUES
 	('Holland'),
@@ -116,13 +117,13 @@ VALUES
 	('Drunken Sailor'),
 	('Gangplanks Bar and Grill');
 
-INSERT INTO Supplies (SupplyName, CostInGoldPieces)
+INSERT INTO Supplies (SupplyName, SupplyUnit, CostInGoldPieces)
 VALUES
-	('Barrels', 5),
-	('Strong Ale', 2),
-	('Weak Ale', 1),
-	('Swords', 10),
-	('Oranges', 20);
+	('Steaks', 'lbs', 5),
+	('Strong Ale', 'barrels', 2),
+	('Weak Ale', 'barrels', 1),
+	('Swords', 'blades', 10),
+	('Oranges', 'bags', 20);
 
 INSERT INTO TavernSupplies (TavernId, SupplyId, SupplyAmount, LastUpdated)
 VALUES
