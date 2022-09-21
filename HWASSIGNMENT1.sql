@@ -244,7 +244,6 @@ LEFT JOIN Guests
 ON Rooms.Id = Guests.Id
 LEFT JOIN RoomStatuses
 ON Rooms.Id = RoomStatuses.Id;
-
 SELECT GuestName, GuestClassId, GuestLevel,
 CASE
 	WHEN GuestLevel < 10 THEN 'Low Level'
