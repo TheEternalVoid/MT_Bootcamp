@@ -294,7 +294,7 @@ FROM GuestClasses
 
 WHERE ClassTwo > 0 AND ClassTwo > 5;
 
---My Levels are associated globally. I can change this if required I also will have questions for this in class.
+--My Levels are associated globally. I can change this if required I also will have questions for this in class
 
 SELECT GuestName, RoomSaleDate 
 
