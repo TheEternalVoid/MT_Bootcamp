@@ -303,3 +303,120 @@ LEFT JOIN Guests
 ON RoomSales.GuestId = Guests.Id
 WHERE RoomSaleDate BETWEEN '1959-01-30' AND '1959-02-15';
 
+--Number 1
+CREATE FUNCTION UserRoles (
+
+)  
+RETURNS TABLE  
+AS  
+RETURN   
+(  
+	SELECT
+	GuestName,
+	RoleId
+	FROM
+		Guests
+
+);
+
+SELECT * FROM UserRoles();
+
+--Number 2
+SELECT COUNT(*), ClassName AS ClassOne
+
+FROM Classes
+LEFT JOIN GuestClasses
+ON Classes.Id = GuestClasses.ClassOne
+GROUP BY ClassName;
+
+--Number 3
+Select GuestName, GuestLevel, ClassName As ClassOne,
+CASE
+	WHEN GuestLevel < 6 THEN 'Beginner'
+	WHEN GuestLevel < 11 THEN 'Intermediate'
+	WHEN GuestLevel > 10 THEN 'Expert'
+END AS LevelBracket
+FROM Guests
+LEFT JOIN GuestClasses
+ON Guests.Id = GuestClasses.Id
+LEFT JOIN Classes
+ON Classes.Id = GuestClasses.ClassOne
+
+ORDER BY GuestName ASC;
+
+--This one I'm a bit confused on I'm pretty sure it should be a scalar function but It's not quite working.
+CREATE FUNCTION GetALevelBracket(@LevelBracket INT)
+
+RETURNS VARCHAR(50)
+AS
+BEGIN
+IF (@LevelBracket < 6)
+RETURN 'Beginner';
+
+END;
+
+--Also Tried this for number 4 but no success
+CREATE FUNCTION GetLevelBracket (@LevelBracket INT)  
+RETURNS TABLE  
+AS  
+RETURN   
+(  
+	Select GuestName, GuestLevel, ClassName As ClassOne,
+	CASE
+		WHEN GuestLevel < 6 THEN 'Beginner'
+		WHEN GuestLevel < 11 THEN 'Intermediate'
+		WHEN GuestLevel > 10 THEN 'Expert'
+	END AS LevelBracket
+	FROM Guests
+	LEFT JOIN GuestClasses
+	ON Guests.Id = GuestClasses.Id
+	LEFT JOIN Classes
+	ON Classes.Id = GuestClasses.ClassOne
+	WHERE GuestLevel = @LevelBracket
+
+);
+
+--Number 5
+CREATE FUNCTION OpenRooms (@DateTaken DATE)  
+RETURNS TABLE  
+AS  
+RETURN   
+(  
+	Select Rooms.Id, TavernName, RoomStatus
+	
+	FROM Rooms
+	LEFT JOIN RoomStatuses
+	ON Rooms.RoomStatusId = RoomStatuses.Id
+	LEFT JOIN Taverns
+	ON Rooms.TavernsId = Taverns.Id
+	LEFT JOIN RoomSales
+	ON RoomSales.RoomId = Rooms.Id
+	WHERE RoomStatusId = 2 AND @DateTaken > RoomSaleDate
+);
+
+--Number 6
+CREATE FUNCTION RoomMinMax ()  
+RETURNS TABLE  
+AS  
+RETURN   
+(  
+	Select TavernName, Min(RoomSellCost) AS SmallestPrice, Max(RoomSellCost) AS LargestPrice
+	
+	FROM RoomSales
+	LEFT JOIN Rooms
+	ON RoomSales.RoomId = Rooms.Id
+	LEFT JOIN Taverns
+	ON Rooms.TavernsId = Taverns.Id
+	GROUP BY TavernName
+);
+
+--Number 7
+DECLARE @SmallestPriceInList AS INT
+
+SELECT @SmallestPriceInList = MIN(SmallestPrice)
+FROM RoomMinMax()
+SET @SmallestPriceInList = @SmallestPriceInList - 1
+
+INSERT INTO RoomSales (GuestId, RoomId, RoomSaleDate, RoomSellCost)
+VALUES
+	(1, 1, '1959-01-31', @SmallestPriceInList)
